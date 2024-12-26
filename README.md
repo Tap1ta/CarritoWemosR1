@@ -28,21 +28,17 @@ Este proyecto presenta el diseño e implementación de un robot móvil autónomo
    const char* ssid = "NOMBRE_DE_TU_WIFI";
    const char* password = "CONTRASEÑA_DE_TU_WIFI";
    ```
-4. Cambia la dirección IP si es necesario, en el siguiente fragmento:
-   ```cpp
-   IPAddress ip(192, 168, 1, 100); // Modificar según tu red
-   ```
-5. Sube el código al Wemos D1 Mini.
+4. Sube el código al Wemos D1 Mini.
 
 ### 2. Configurar la Interfaz Web
 1. Coloca el archivo `index.html` en tu servidor web local, o utilízalo directamente en combinación con el microcontrolador.
 2. Asegúrate de que la dirección IP en el código HTML coincida con la dirección configurada en el microcontrolador:
    ```javascript
-   const robotIP = "http://192.168.1.100"; // Modificar según tu red
+   const socket = new WebSocket("ws://192.168.1.100:81") // Modificar según tu red
    ```
 
 ### 3. Conectar el Hardware
-1. Ensambla los motores y el reductor de voltaje al Wemos D1 Mini según el diagrama proporcionado en el proyecto (o en Tinkercad).
+1. Ensambla los motores y el reductor de voltaje al Wemos D1 Mini según el diagrama proporcionado en el proyecto.
 2. Verifica que las conexiones sean correctas y asegúrate de que el sistema esté alimentado correctamente.
 
 ### 4. Configuración Final
@@ -60,6 +56,7 @@ ademas de ajustar la logica para obtener mejores resultados en la respuesta a la
 
 ## Créditos
 Desarrollado por: Jeremy Valera, Ever Quispe
+
 Contacto: esqu3ma@gmail.com
 
 ## Licencia
