@@ -1,0 +1,182 @@
+HTML
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control de Carrito</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      color: #333;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 2rem;
+      color: #007BFF;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .button-group {
+      margin: 20px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .button-group.left-right {
+      justify-content: space-between;
+    }
+
+    button {
+      font-size: 16px;
+      margin: 10px;
+      padding: 15px 25px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007BFF;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+      transform: scale(1.05);
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .status {
+      margin-top: 20px;
+      font-size: 1rem;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>Control de Carrito - Need for Speed</h1>
+  <div class="container">
+    <div class="button-group">
+      <button id="luces_on" onclick="sendCommand('luces_on')">Encender Luces</button>
+      <button id="luces_off" onclick="sendCommand('luces_off')">Apagar Luces</button>
+    </div>
+
+    <div class="button-group left-right">
+      <button id="left" onmousedown="startCommand('left')" onmouseup="stopCommand('stop_dir')">Izquierda</button>
+      <button id="right" onmousedown="startCommand('right')" onmouseup="stopCommand('stop_dir')">Derecha</button>
+    </div>
+
+    <div class="button-group">
+      <button id="accelerate" onclick="sendCommand('accelerate')">Acelerar</button>
+      <button id="decelerate" onclick="sendCommand('decelerate')">Desacelerar</button>
+      <button id="stop_motor" onclick="sendCommand('stop_motor')">Detener Motor</button>
+    </div>
+
+    <div class="status" id="status">
+      Estado: Conectando...
+    </div>
+  </div>
+
+  <script>
+    const socket = new WebSocket('ws://192.168.100.110:81');
+    const statusElement = document.getElementById('status');
+    const buttons = {
+      accelerate: document.getElementById('accelerate'),
+      decelerate: document.getElementById('decelerate'),
+      stop_motor: document.getElementById('stop_motor'),
+    };
+
+    let enMovimiento = false;
+    let retrocediendo = false;
+    
+    socket.onopen = () => {
+      console.log('WebSocket conectado');
+      statusElement.textContent = 'Estado: Conectado';
+      statusElement.style.color = 'green';
+
+      for (const button in buttons) {
+        buttons[button].disabled = false;
+      }
+    };
+
+    socket.onclose = () => {
+      console.log('WebSocket desconectado');
+      statusElement.textContent = 'Estado: Desconectado';
+      statusElement.style.color = 'red';
+
+      for (const button in buttons) {
+        buttons[button].disabled = true;
+      }
+    };
+
+    socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+      statusElement.textContent = 'Estado: Error en conexión';
+      statusElement.style.color = 'orange';
+    };
+    
+    function sendCommand(command) {
+      if (socket.readyState === WebSocket.OPEN) {
+        if (command === 'decelerate' && enMovimiento) {
+          enMovimiento = false;
+          retrocediendo = true;
+        } else if (command === 'accelerate') {
+          enMovimiento = true;
+          retrocediendo = false;
+        }
+
+        socket.send(command);
+        console.log(`Comando enviado: ${command}`);
+      } else {
+        console.error('WebSocket no está conectado');
+        alert('No se puede enviar el comando: WebSocket no está conectado');
+      }
+    }
+
+    function startCommand(command) {
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(command);
+        console.log(`Comando enviado: ${command}`);
+      } else {
+        console.error('WebSocket no está conectado');
+      }
+    }
+
+    function stopCommand(command) {
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(command);
+        console.log(`Comando enviado: ${command}`);
+      } else {
+        console.error('WebSocket no está conectado');
+      }
+    }
+  </script>
+</body>
+</html>
